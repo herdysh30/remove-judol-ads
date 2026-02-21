@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Remove Judol Ads",
-  "version": "2.1",
+  "version": "2.1.0",
   "description": "Menghapus elemen iklan judol berupa <a> yang berisi <img>, overlay ads, dan blokir popup ke situs judol",
   "permissions": ["storage", "activeTab"],
   "icons": {
