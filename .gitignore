@@ -1,0 +1,25 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# Build output
+dist/
+build/
+*.zip
+*.crx
+*.pem
+
+# Node (jika pakai tools)
+node_modules/
+package-lock.json
+
+# Gemini
+.gemini/

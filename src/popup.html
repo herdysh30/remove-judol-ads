@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Remove Judol Ads</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-title">
+          <span class="shield-icon">🛡️</span>
+          <h1>Remove Judol</h1>
+        </div>
+        <p class="subtitle">Blokir iklan judi online</p>
+      </div>
+
+      <!-- Toggle Master -->
+      <div class="toggle-section">
+        <label class="toggle-label">
+          <span>Aktifkan Ekstensi</span>
+          <div class="toggle">
+            <input type="checkbox" id="masterToggle" checked />
+            <span class="slider"></span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-number" id="blockedCount">0</span>
+          <span class="stat-label">Diblokir hari ini</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="totalRules">0</span>
+          <span class="stat-label">Total aturan</span>
+        </div>
+      </div>
+
+      <!-- Picker Button -->
+      <div class="picker-section">
+        <button id="pickerBtn" class="btn-picker">
+          <span class="picker-icon">🎯</span>
+          <span>Pilih Elemen di Halaman</span>
+        </button>
+        <p class="picker-hint">Klik elemen iklan langsung di halaman web</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="keywords">Keywords</button>
+        <button class="tab" data-tab="tlds">TLD</button>
+        <button class="tab" data-tab="domains">Domain IMG</button>
+        <button class="tab" data-tab="shorteners">Shortener</button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div class="tab-content active" id="tab-keywords">
+        <div class="input-group">
+          <input
+            type="text"
+            id="input-keywords"
+            placeholder="Tambah keyword (misal: slot)"
+          />
+          <button class="btn-add" data-target="keywords">+</button>
+        </div>
+        <div class="items-list" id="list-keywords"></div>
+      </div>
+
+      <div class="tab-content" id="tab-tlds">
+        <div class="input-group">
+          <input
+            type="text"
+            id="input-tlds"
+            placeholder="Tambah TLD (misal: .xyz)"
+          />
+          <button class="btn-add" data-target="tlds">+</button>
+        </div>
+        <div class="items-list" id="list-tlds"></div>
+      </div>
+
+      <div class="tab-content" id="tab-domains">
+        <div class="input-group">
+          <input
+            type="text"
+            id="input-domains"
+            placeholder="Tambah domain gambar"
+          />
+          <button class="btn-add" data-target="domains">+</button>
+        </div>
+        <div class="items-list" id="list-domains"></div>
+      </div>
+
+      <div class="tab-content" id="tab-shorteners">
+        <div class="input-group">
+          <input
+            type="text"
+            id="input-shorteners"
+            placeholder="Tambah shortener (misal: bit.ly)"
+          />
+          <button class="btn-add" data-target="shorteners">+</button>
+        </div>
+        <div class="items-list" id="list-shorteners"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <button id="resetBtn" class="btn-reset">Reset ke Default</button>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
