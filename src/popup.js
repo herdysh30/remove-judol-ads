@@ -25,6 +25,25 @@ const DEFAULTS = {
     "emas5000",
     "qqsawer",
     "stkawaii",
+    "slot7000",
+    "papa303",
+    "dorawin",
+    "sabangbet",
+    "setiatoto",
+    "ketuaslot",
+    "ketuagacor",
+    "vitatoto",
+    "lancar138",
+    "hokijp168",
+    "erigo4d",
+    "gacor",
+    "maxwin",
+    "cuan",
+    "wede",
+    "jp168",
+    "toto",
+    "scatter",
+    "jackpot",
   ],
   tlds: [
     ".space",
@@ -47,6 +66,9 @@ const DEFAULTS = {
     ".cc",
     ".cam",
     ".biz",
+    ".ink",
+    ".vip",
+    ".onl",
   ],
   domains: ["blogger.googleusercontent.com"],
   shorteners: [
@@ -56,6 +78,13 @@ const DEFAULTS = {
     "s.id",
     "shorturl.at",
     "rb.gy",
+    "t.ly",
+    "rebrand.ly",
+    "cepaturl.com",
+    "pastibagus.com",
+    "linkmasuk.vip",
+    "lae.onl",
+    "williamcgordon.com",
   ],
 };
 
@@ -84,6 +113,20 @@ async function loadConfig() {
   const enabled =
     enabledData.judolEnabled !== undefined ? enabledData.judolEnabled : true;
   document.getElementById("masterToggle").checked = enabled;
+
+  // Load anti-tab settings
+  const antiTabData = await chrome.storage.local.get([
+    "antiTabEnabled",
+    "antiTabMode",
+  ]);
+  const antiTabOn =
+    antiTabData.antiTabEnabled !== undefined
+      ? antiTabData.antiTabEnabled
+      : true;
+  const antiTabMode = antiTabData.antiTabMode || "normal";
+
+  document.getElementById("antiTabToggle").checked = antiTabOn;
+  updateModeSelector(antiTabMode, antiTabOn);
 }
 
 async function saveConfig() {
@@ -105,6 +148,38 @@ async function saveEnabled(enabled) {
     tabs.forEach((tab) => {
       chrome.tabs
         .sendMessage(tab.id, { type: "toggleEnabled", enabled })
+        .catch(() => {});
+    });
+  });
+}
+
+// Anti-tab helpers
+function updateModeSelector(mode, enabled) {
+  const selector = document.getElementById("modeSelector");
+  if (enabled) {
+    selector.classList.remove("disabled");
+  } else {
+    selector.classList.add("disabled");
+  }
+  document.querySelectorAll(".mode-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+}
+
+async function saveAntiTab(enabled, mode) {
+  await chrome.storage.local.set({
+    antiTabEnabled: enabled,
+    antiTabMode: mode,
+  });
+  // Notify content scripts
+  chrome.tabs.query({}, (tabs) => {
+    tabs.forEach((tab) => {
+      chrome.tabs
+        .sendMessage(tab.id, {
+          type: "antiTabUpdated",
+          antiTabEnabled: enabled,
+          antiTabMode: mode,
+        })
         .catch(() => {});
     });
   });
@@ -191,8 +266,15 @@ function updateStats() {
 
   // Load blocked count
   chrome.storage.local.get("judolBlockedToday", (data) => {
-    document.getElementById("blockedCount").textContent =
-      data.judolBlockedToday || 0;
+    const stored = data.judolBlockedToday;
+    let count = 0;
+    if (typeof stored === "object" && stored !== null) {
+      const today = new Date().toDateString();
+      count = stored.date === today ? stored.count || 0 : 0;
+    } else if (typeof stored === "number") {
+      count = stored;
+    }
+    document.getElementById("blockedCount").textContent = count;
   });
 }
 
@@ -334,6 +416,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (confirm("Reset semua ke default? Item custom akan dihapus.")) {
       resetToDefaults();
     }
+  });
+
+  // Anti-tab toggle
+  document.getElementById("antiTabToggle").addEventListener("change", (e) => {
+    const enabled = e.target.checked;
+    const mode = document.querySelector(".mode-btn.active").dataset.mode;
+    updateModeSelector(mode, enabled);
+    saveAntiTab(enabled, mode);
+    showToast(enabled ? "Anti pindah tab aktif ✓" : "Anti pindah tab nonaktif");
+  });
+
+  // Mode selector buttons
+  document.querySelectorAll(".mode-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.mode;
+      const enabled = document.getElementById("antiTabToggle").checked;
+      updateModeSelector(mode, enabled);
+      saveAntiTab(enabled, mode);
+      showToast(
+        mode === "aggressive"
+          ? "Mode agresif aktif ⚡"
+          : "Mode normal aktif 🛡️",
+      );
+    });
   });
 
   // Picker button
