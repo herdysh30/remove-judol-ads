@@ -16,7 +16,7 @@ Ekstensi Chrome untuk memblokir iklan judi online (judol) di website Indonesia.
 
 1. Clone repository:
    ```bash
-   git clone https://github.com/USERNAME/remove-judol-ads.git
+   git clone https://github.com/herdysh30/remove-judol-ads.git
    ```
 2. Buka `chrome://extensions/` di Chrome
 3. Aktifkan **Developer mode** (toggle di kanan atas)
