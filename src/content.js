@@ -25,6 +25,25 @@ const DEFAULT_CONFIG = {
     "emas5000",
     "qqsawer",
     "stkawaii",
+    "slot7000",
+    "papa303",
+    "dorawin",
+    "sabangbet",
+    "setiatoto",
+    "ketuaslot",
+    "ketuagacor",
+    "vitatoto",
+    "lancar138",
+    "hokijp168",
+    "erigo4d",
+    "gacor",
+    "maxwin",
+    "cuan",
+    "wede",
+    "jp168",
+    "toto",
+    "scatter",
+    "jackpot",
   ],
   tlds: [
     ".space",
@@ -47,6 +66,9 @@ const DEFAULT_CONFIG = {
     ".cc",
     ".cam",
     ".biz",
+    ".ink",
+    ".vip",
+    ".onl",
   ],
   domains: ["blogger.googleusercontent.com"],
   shorteners: [
@@ -56,6 +78,13 @@ const DEFAULT_CONFIG = {
     "s.id",
     "shorturl.at",
     "rb.gy",
+    "t.ly",
+    "rebrand.ly",
+    "cepaturl.com",
+    "pastibagus.com",
+    "linkmasuk.vip",
+    "lae.onl",
+    "williamcgordon.com",
   ],
 };
 
@@ -69,6 +98,11 @@ const AD_CONTAINER_SELECTORS = [
   // WordPress Popup Builder plugin
   "[class*='sgpb-popup-dialog-main-div-theme-wrapper']",
   "[class*='sgpb-popup-overlay']",
+  // Oploverz-style ad containers
+  ".kln",
+  "#overplay",
+  "#shadow",
+  ".blox.mlb",
 ];
 
 // =============================================
@@ -102,6 +136,8 @@ let CONFIG = {
   shortenerDomains: [...DEFAULT_CONFIG.shorteners],
 };
 let isEnabled = true;
+let antiTabEnabled = true;
+let antiTabMode = "normal"; // "normal" atau "aggressive"
 
 // =============================================
 // LOAD CONFIG DARI CHROME STORAGE
@@ -111,10 +147,17 @@ async function loadConfig() {
     const data = await chrome.storage.local.get([
       "judolConfig",
       "judolEnabled",
+      "antiTabEnabled",
+      "antiTabMode",
     ]);
 
     // Enabled state
     isEnabled = data.judolEnabled !== undefined ? data.judolEnabled : true;
+
+    // Anti-tab settings
+    antiTabEnabled =
+      data.antiTabEnabled !== undefined ? data.antiTabEnabled : true;
+    antiTabMode = data.antiTabMode || "normal";
 
     // Merge default + custom items
     const saved = data.judolConfig || {};
@@ -204,13 +247,17 @@ function incrementBlocked(count = 1) {
     const today = new Date().toDateString();
     const stored = data.judolBlockedToday || { date: today, count: 0 };
 
-    if (stored.date !== today) {
-      stored.date = today;
-      stored.count = 0;
-    }
-    stored.count += count;
+    // Jika stored adalah angka (dari bug lama), konversi ke objek
+    const obj =
+      typeof stored === "number" ? { date: today, count: stored } : stored;
 
-    chrome.storage.local.set({ judolBlockedToday: stored.count });
+    if (obj.date !== today) {
+      obj.date = today;
+      obj.count = 0;
+    }
+    obj.count += count;
+
+    chrome.storage.local.set({ judolBlockedToday: obj });
   });
 }
 
@@ -327,6 +374,8 @@ function blockJudolPopups() {
     keywords: CONFIG.keywords,
     tlds: CONFIG.suspiciousTLDs,
     shorteners: CONFIG.shortenerDomains,
+    antiTabEnabled: antiTabEnabled,
+    antiTabMode: antiTabMode,
   });
   document.documentElement.prepend(configEl);
 
@@ -345,6 +394,8 @@ function updateInjectedConfig() {
         keywords: CONFIG.keywords,
         tlds: CONFIG.suspiciousTLDs,
         shorteners: CONFIG.shortenerDomains,
+        antiTabEnabled: antiTabEnabled,
+        antiTabMode: antiTabMode,
       },
     }),
   );
@@ -371,6 +422,11 @@ chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "toggleEnabled") {
     isEnabled = msg.enabled;
     if (isEnabled) removeAllAds();
+  }
+  if (msg.type === "antiTabUpdated") {
+    antiTabEnabled = msg.antiTabEnabled;
+    antiTabMode = msg.antiTabMode;
+    updateInjectedConfig();
   }
   if (msg.type === "startPicker") {
     startElementPicker();
